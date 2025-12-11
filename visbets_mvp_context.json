@@ -1,0 +1,177 @@
+{
+  "projectName": "VisBets MVP - Data Explorer (No ML)",
+  "version": "1.0.0",
+  "goal": "Build a production-ready MVP mobile app that fetches NBA player/game data and sportsbook lines, performs simple data manipulation (aggregations, rolling averages, deltas), and displays them in clear, interactive views (no machine learning).",
+  "targetPlatform": "React Native app using Expo (iOS primary, Android secondary).",
+  "primaryUser": {
+    "description": "Sports bettor or NBA fan who wants a clean dashboard for tonight's slate and player stats.",
+    "coreNeed": "Quickly see relevant stats and line comparisons without manual spreadsheet work."
+  },
+  "nonGoals": [
+    "No machine learning models.",
+    "No complex backtesting engine.",
+    "No social features or slip sharing.",
+    "No multi-sport support in MVP (NBA only)."
+  ],
+  "techStack": {
+    "frontend": {
+      "framework": "React Native with Expo",
+      "stateManagement": "Zustand or Redux (developer choice, default to Zustand)",
+      "navigation": "@react-navigation/native",
+      "networking": "Axios or fetch",
+      "designStyle": "Simple card-based UI, dark theme with green accents for 'edge' or good spots."
+    },
+    "backend": {
+      "hasBackend": true,
+      "framework": "FastAPI (Python)",
+      "database": "PostgreSQL",
+      "auth": "Simple email/password or anonymous auth for MVP (can integrate with Firebase later)."
+    }
+  },
+  "dataSources": {
+    "nbaData": {
+      "name": "BallDontLie (or similar NBA stats API)",
+      "usage": [
+        "Fetch players",
+        "Fetch games and box scores",
+        "Fetch season averages"
+      ]
+    },
+    "sportsbookLines": {
+      "description": "Initial MVP can mock these or use a simple scraping/unofficial API layer. The important part is handling a JSON format like:",
+      "exampleLineFormat": {
+        "player_id": 237,
+        "player_name": "LeBron James",
+        "team": "LAL",
+        "market": "points",
+        "line": 27.5,
+        "book": "PrizePicks",
+        "game_date": "2025-12-07"
+      }
+    }
+  },
+  "coreEntities": {
+    "Player": {
+      "fields": [
+        "id",
+        "name",
+        "team",
+        "position",
+        "photo_url"
+      ]
+    },
+    "Game": {
+      "fields": [
+        "id",
+        "home_team",
+        "away_team",
+        "date",
+        "status"
+      ]
+    },
+    "PlayerGameStats": {
+      "fields": [
+        "player_id",
+        "game_id",
+        "points",
+        "rebounds",
+        "assists",
+        "minutes",
+        "date"
+      ]
+    },
+    "SportsbookLine": {
+      "fields": [
+        "player_id",
+        "market",
+        "line_value",
+        "book",
+        "date"
+      ]
+    }
+  },
+  "derivedMetrics": {
+    "description": "All 'insight' in the MVP is from simple data manipulation NOT ML.",
+    "metrics": [
+      "season_avg_points",
+      "last_5_games_avg_points",
+      "last_10_games_avg_points",
+      "diff_last_5_vs_season_avg",
+      "diff_line_vs_season_avg",
+      "diff_line_vs_last_5_avg"
+    ]
+  },
+  "frontendScreens": [
+    {
+      "name": "DashboardScreen",
+      "purpose": "Show tonight's NBA slate, list top players with key stats and line comparisons.",
+      "coreUIElements": [
+        "Date selector (default: today)",
+        "Search bar for player name",
+        "Filter chips: points, rebounds, assists, PRA",
+        "Player cards: name, team, market, line, season avg, last 5 avg, simple 'edge' indicator (just numeric difference or %)."
+      ]
+    },
+    {
+      "name": "PlayerDetailScreen",
+      "purpose": "Give a deeper view of a single player.",
+      "coreUIElements": [
+        "Header: name, team, position, image",
+        "Tabs: 'Overview', 'Game Log'",
+        "Overview: season vs last 5/10 stats, current lines with diffs.",
+        "Game log table: last N games with points/rebounds/assists and minutes."
+      ]
+    },
+    {
+      "name": "SettingsScreen",
+      "purpose": "Basic settings such as theme, favorite markets, and mock login/subscription stub."
+    }
+  ],
+  "backendEndpoints": [
+    {
+      "method": "GET",
+      "path": "/api/slate",
+      "description": "Return tonight's games and players with manipulated stats and any available lines.",
+      "responseShape": {
+        "date": "2025-12-07",
+        "players": [
+          {
+            "player_id": 237,
+            "name": "LeBron James",
+            "team": "LAL",
+            "opponent": "BOS",
+            "markets": [
+              {
+                "market": "points",
+                "line": 27.5,
+                "season_avg": 26.1,
+                "last5_avg": 29.3,
+                "delta_line_vs_last5": 1.8,
+                "delta_line_vs_season": 1.4
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/player/{player_id}",
+      "description": "Return player profile, season averages, game logs, and lines.",
+      "responseContains": [
+        "player",
+        "season_averages",
+        "last_n_averages",
+        "game_logs",
+        "current_lines"
+      ]
+    }
+  ],
+  "mvpAcceptanceCriteria": [
+    "User can open the app and see a list of players for today's games.",
+    "User can tap a player to see a detail screen with game logs and simple derived averages.",
+    "User can see sportsbook lines and basic delta calculations vs player averages.",
+    "The app does not rely on any machine learning or training pipeline.",
+    "All data manipulation is simple, deterministic aggregation and arithmetic, done either in backend or in-app."
+  ]
+}
