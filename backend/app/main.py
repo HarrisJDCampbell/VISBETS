@@ -44,7 +44,7 @@ from .config import get_settings, Settings
 from .utils.api_helpers import get_api_headers
 from .services.api_sports import APISportsService, get_api_service
 from .routes import predictions
-from .routers import nba, scraper, slate, player_detail, mock_slate
+from .routers import nba, scraper, slate, player_detail, mock_slate, auth
 from .services.prediction_service import PredictionService
 from .services.data_collector import DataCollector
 from .db.database import get_async_db, init_db, init_db_sync, AsyncSessionLocal
@@ -681,6 +681,7 @@ async def clear_expired_cache_task():
         await asyncio.sleep(3600)
 
 # Include routers
+app.include_router(auth.router)
 app.include_router(predictions.router)
 app.include_router(nba.router)
 app.include_router(scraper.router)

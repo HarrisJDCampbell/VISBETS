@@ -74,3 +74,4 @@ build/
 *.apk
 *.ipa
 *.app
+GoogleService-Info.plist

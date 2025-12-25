@@ -31,6 +31,16 @@ class Settings(BaseSettings):
     API_RATE_LIMIT_PER_MINUTE: int = 60
     API_RATE_LIMIT_DELAY: float = 1.0
 
+    # Authentication & Security
+    SECRET_KEY: str = "your-secret-key-here"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+
+    # Google OAuth Configuration
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+
     class Config:
         env_file = ".env"
 

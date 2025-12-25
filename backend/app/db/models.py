@@ -1,9 +1,46 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Text, Boolean, JSON, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Text, Boolean, JSON, UniqueConstraint, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
 Base = declarative_base()
+
+# Association table for user favorites
+user_favorites = Table(
+    'user_favorites',
+    Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.id'), primary_key=True),
+    Column('player_id', Integer, ForeignKey('players.id'), primary_key=True),
+    Column('created_at', DateTime, default=datetime.utcnow)
+)
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True)
+    email = Column(String(255), unique=True, nullable=False, index=True)
+    hashed_password = Column(String(255), nullable=True)  # Nullable for OAuth users
+    first_name = Column(String(100), nullable=False)
+    last_name = Column(String(100), nullable=False)
+    phone_number = Column(String(20), nullable=True)
+    primary_betting_app = Column(String(50), nullable=False)  # DraftKings, FanDuel, PrizePicks, Underdog
+    subscription_tier = Column(String(20), default='Free')  # Free, VisPlus, VisMax
+
+    # OAuth fields
+    google_id = Column(String(255), unique=True, nullable=True)
+    oauth_provider = Column(String(50), nullable=True)  # 'google', etc.
+
+    # Account metadata
+    is_active = Column(Boolean, default=True)
+    email_verified = Column(Boolean, default=False)
+    last_login = Column(DateTime, nullable=True)
+
+    # Relationships
+    favorite_players = relationship("Player", secondary=user_favorites, lazy="selectin")
+
+    # Metadata
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 class Team(Base):
     __tablename__ = "teams"
